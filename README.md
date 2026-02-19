@@ -1,2 +1,3 @@
-# Pine Scripts
-A collection of technical trading indicators and strategies for use on the TradingView charting platform
+# TradingView Pine Scripts
+
+My technical trading indicators and strategies for use on the TradingView charting platform.
