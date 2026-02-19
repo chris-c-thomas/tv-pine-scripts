@@ -10,7 +10,7 @@
 // ============================================================================
 //@version=6
 indicator(
-     title     = "SPY 0DTE Scalper",
+     title     = "SPY 0DTE Scalper (1m)",
      shorttitle = "SPY-0DTE",
      overlay   = true,
      max_labels_count  = 500,
