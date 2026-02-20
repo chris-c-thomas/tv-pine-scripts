@@ -1,4 +1,4 @@
-# TradingView Pine Scripts
+# Pine Scripts for TradingView
 
 Technical trading indicators for the TradingView charting platform, written in Pine Script v6.
 
