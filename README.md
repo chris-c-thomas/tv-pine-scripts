@@ -2,7 +2,10 @@
 
 A growing collection of technical trading indicators and strategy tools for the TradingView charting platform, written in Pine Script v6.
 
----
+Pine Script Documentation:
+- [Pine Script User Manual](https://www.tradingview.com/pine-script-docs/)
+- [Pine Script Language Reference Manual](https://www.tradingview.com/pine-script-reference/v6/)
+- [PineCoders](https://www.pinecoders.com/)
 
 ## Overview
 
@@ -10,9 +13,7 @@ This repository is an evolving toolkit for systematic intraday trading on Tradin
 
 Currently, the suite includes a family of SPY 0DTE Scalper indicators spanning three timeframes (1-minute, 5-minute, 15-minute), each independently calibrated for its target holding period, plus a general-purpose Market Monitor for watchlist reconnaissance. All indicators share a common architectural foundation: EMA ribbon overlays, session-anchored VWAP with deviation bands, regime classification, and real-time dashboards with color-coded status fields. They diverge in signal generation approach, parameter calibration, and feature depth based on the characteristics of their target timeframe.
 
----
-
-## Current Indicators
+## Indicators
 
 ### SPY 0DTE Scalper
 
@@ -39,8 +40,6 @@ This is not a signal generator. It answers one question: "which way is the wind 
 | ------ | ------- | ---- |
 | [market_monitor_v1_0.pine](market_monitor/market_monitor_v1_0.pine) | v1.0 | [docs](docs/market_monitor_v1_0.md) |
 
----
-
 ## Timeframe Comparison
 
 Key parameter and architectural differences across the SPY 0DTE Scalper variants (v1.1 for each):
@@ -61,8 +60,6 @@ Key parameter and architectural differences across the SPY 0DTE Scalper variants
 | MTF Confirmation | N/A | 1-min RSI + EMA | 5-min RSI + EMA |
 | RTH Bars / Session | ~390 | ~78 | ~26 |
 | Dashboard Rows | 16 | 18 | 18+ |
-
----
 
 ## Core Components
 
@@ -85,8 +82,6 @@ Every indicator in the suite shares these foundational components, calibrated pe
 **TTM Squeeze** -- Bollinger Band (20, 2.0) compression inside Keltner Channels (20, 1.5). Three states: SQUEEZE ON (compression building), FIRED (breakout beginning), OFF (normal volatility). Momentum histogram via linear regression.
 
 **NYSE TICK Index** -- Real-time market breadth via `request.security("USI:TICK", "1", close)`. Six-tier classification from EXTREME BEAR to EXTREME BULL with configurable thresholds.
-
----
 
 ## Installation
 
@@ -115,12 +110,9 @@ timezone — configured under *Symbol > Data Modification > Timezone* — only a
 how timestamps are displayed on the x-axis of your chart. It has no impact on how the indicator
 detects sessions, calculates levels, or generates signals.
 
-
 ### Data Requirements
 
 **NYSE TICK** (v1.1 only): The TICK index (`USI:TICK`) requires your TradingView data plan to include the relevant exchange. If unavailable, TICK rows show "N/A" and TICK-based signal conditions pass through without blocking (1-min) or simply don't contribute score (5-min, 15-min).
-
----
 
 ## Recommended Layouts
 
@@ -135,8 +127,6 @@ Run 2-3 SPY 0DTE Scalper variants side-by-side (e.g., 1-min + 5-min, or 5-min + 
 ### Watchlist Reconnaissance
 
 Run 6-8 Market Monitor instances on small chart tiles across your watchlist. Use Tiny or Small dashboard size with Top Right positioning. Identify which tickers show strong directional bias (score >= +3 or <= -3), then open a dedicated chart with the appropriate 0DTE Scalper for signal generation.
-
----
 
 ## Performance and Limits
 
@@ -153,8 +143,6 @@ All indicators are optimized for simultaneous multi-instance execution on Tradin
 
 **Repainting**: All signal logic is gated by `barstate.isconfirmed` by default. Signals appear after bar close, not during formation. `request.security()` calls use `lookahead=barmerge.lookahead_off` for all forward-looking data to prevent future data leakage. Prior day levels use `lookahead_on` which is appropriate for historical reference levels.
 
----
-
 ## Known Limitations
 
 **No cumulative delta / order flow.** Pine Script lacks access to tick-level bid/ask data. Relative volume and NYSE TICK are the closest available proxies.
@@ -166,8 +154,6 @@ All indicators are optimized for simultaneous multi-instance execution on Tradin
 **No backtest capability.** These are `indicator()` scripts, not `strategy()` scripts. They cannot be run through TradingView's strategy tester. Conversion would require defining explicit entry/exit rules, position sizing, and stop/target logic.
 
 **Equal-weighted conditions (1-min).** The 1-minute AND-gate treats all conditions as binary pass/fail with no relative weighting. The 5-minute and 15-minute scoring models partially address this by allowing differential contribution.
-
----
 
 ## Project Structure
 
@@ -192,13 +178,9 @@ All indicators are optimized for simultaneous multi-instance execution on Tradin
     └── spy_0dte_scalper_15min_v1_1.md
 ```
 
----
-
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
-
----
 
 ## Roadmap
 
@@ -221,8 +203,6 @@ Planned additions to the toolkit, roughly ordered by priority. Development order
 - [ ] **Multi-Asset Correlation Monitor** -- Real-time correlation and divergence tracking across related instruments (SPY/QQQ, SPY/IWM, SPY/VIX, 10Y yield/equities). Alerts on correlation breakdowns signaling rotation, risk-off events, or tradable divergence setups.
 
 - [ ] **Alert Pipeline Templates** -- Pre-built webhook payload templates and integration guides for routing TradingView alerts to external systems (Discord, Telegram, Slack, custom APIs). Includes JSON payload formatting, conditional routing logic, and downstream automation documentation.
-
----
 
 ## License
 
