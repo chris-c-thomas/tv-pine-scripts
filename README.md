@@ -22,7 +22,9 @@ A high-precision scalping indicator for zero-days-to-expiration SPY options. Fea
 | [spy_0dte_scalper_1min_v1.1.pine](spy_0dte_scalper/spy_0dte_scalper_1min_v1.1.pine) | 1-minute | v1.1 | [docs](docs/spy_0dte_scalper_1min_v1.1.md) |
 | [spy_0dte_scalper_5min_v1.0.pine](spy_0dte_scalper/spy_0dte_scalper_5min_v1.0.pine) | 5-minute | v1.0 | [docs](docs/spy_0dte_scalper_5min_v1.0.md) |
 | [spy_0dte_scalper_5min_v1.1.pine](spy_0dte_scalper/spy_0dte_scalper_5min_v1.1.pine) | 5-minute | v1.1 | [docs](docs/spy_0dte_scalper_5min_v1.1.md) |
+| [spy_0dte_scalper_15min_v1_0.pine](spy_0dte_scalper/spy_0dte_scalper_15min_v1_0.pine) | 15-minute | v1.0 | [docs](docs/spy_0dte_scalper_15min_v1_0.md) |
+| [spy_0dte_scalper_15min_v1_1.pine](spy_0dte_scalper/spy_0dte_scalper_15min_v1_1.pine) | 15-minute | v1.1 | [docs](docs/spy_0dte_scalper_15min_v1_1.md) |
 
 ## License
 
-MIT [LICENSE](LICENSE)
+MIT License. See [LICENSE](LICENSE).
