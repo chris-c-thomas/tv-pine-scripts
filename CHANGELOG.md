@@ -4,6 +4,52 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## v1.0 (2026-02-27) -- Trend Compass Daily + 4H
+
+- New strategic trend assessment indicator family for multi-day/multi-week trend evaluation on any equity, ETF, or index.
+- Ticker-agnostic design: no hardcoded symbols, no session-specific logic. Works on NVDA, AAPL, GOOGL, SPY, QQQ, IWM, or any liquid instrument.
+- No signal generation — pure trend context, strength assessment, and structural positioning.
+
+**Daily variant (TC-D)**:
+- EMA Ribbon (10/21/50) with dynamic cloud fill and 200 EMA anchor (local).
+- Weekly 50 EMA via `request.security()` for macro trend context.
+- Trend Phase Classifier: EMERGING / ACCELERATING / MATURE / EXHAUSTING / CONSOLIDATING / REVERSING based on ADX value, ADX slope, EMA spread, and crossover detection.
+- Composite Weighted Trend Score (-11 to +11) with 8 conditions: 3 structural (2x weight) + 5 confirmation (1x).
+- Score trend tracking (IMPROVING / STABLE / FADING) via 5-bar SMA comparison.
+- ADX slope analysis: RISING / FLAT / FALLING trend strength momentum.
+- 50 EMA slope + slope acceleration (second derivative) for trend curvature analysis.
+- RSI divergence detection (bullish, bearish, hidden bull, hidden bear) with visual dashed line segments on price chart. Pivot-based (5L/3R default), 15-bar decay.
+- MACD (12/26/9) divergence detection with dotted line segments. Distinct visual style from RSI divergences.
+- OBV trend confirmation via 21-EMA slope: CONFIRMING / DIVERGING / NEUTRAL.
+- Relative volume (20-bar SMA baseline) with SPIKE / ABOVE / NORMAL / DRY classification.
+- ATR percentile ranking (100-bar lookback) with LOW / NORMAL / HIGH / EXTREME regime classification.
+- Bollinger Band width percentile (100-bar lookback) for compression/breakout detection.
+- 52-week high/low via `ta.highest(252)` / `ta.lowest(252)` with position-in-range percentage.
+- Prior Week H/L/C and Prior Month H/L/C reference levels.
+- Fibonacci retracement (optional, default OFF): 38.2% / 50% / 61.8% auto-calculated from lookback range.
+- Ichimoku Cloud (optional, default OFF): standard 9/26/52/26 with Kumo fill.
+- 17-row dashboard with configurable position and size.
+- 12 alert conditions: phase change, strong bull/bear, neutral cross, RSI/MACD divergences (4), golden/death cross (50/200), ATR regime change, BB extreme compression.
+- 3 `request.security` calls (Weekly EMA, prior week H/L/C, prior month H/L/C).
+
+**4-Hour variant (TC-4H)**:
+- Same architecture as Daily with recalibrated parameters for 4-hour bars.
+- Anchor EMA = Daily 200 EMA via `request.security()` (not local — 200 bars on 4H = 33 days, insufficient for institutional weight).
+- Three HTF EMA layers: Daily 50 EMA, Daily 200 EMA, Weekly 50 EMA — all individually toggleable.
+- 52-week H/L pulled from Daily timeframe via `request.security()` for accuracy.
+- Key levels: Prior Day H/L/C + Prior Week H/L/C (vs Week + Month on Daily).
+- Divergence pivots tuned faster: 4L/2R default (vs 5L/3R), 20-bar decay (~3.5 days vs 15 days).
+- Percentile lookbacks widened to 200 bars (~33 trading days) to cover equivalent calendar time.
+- EMA compression threshold tightened to 0.3% (vs 0.5%) for 4H bar scale.
+- EMA slope threshold tightened to 0.005 (vs 0.01) for smaller per-bar moves.
+- Crossover detection windows widened: fast/mid 4 bars, mid/slow 6 bars (vs 3/5 on Daily).
+- Golden/Death Cross alerts fire on Daily 50/200 EMA values from `request.security()`.
+- 18-row dashboard (adds D 200 EMA + W 50 EMA rows, separate 52w position row).
+- 12 alert conditions (same set as Daily).
+- 6 `request.security` calls (D200 EMA, D50 EMA, W50 EMA, prior day H/L/C, prior week H/L/C, 52w H/L).
+
+---
+
 ## v1.0 (2026-02-27) -- Market Monitor 5m
 
 - New 5-minute optimized Market Monitor variant with weighted directional bias scoring.

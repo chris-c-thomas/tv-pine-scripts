@@ -9,9 +9,9 @@ Pine Script Documentation:
 
 ## Overview
 
-This repository is an evolving toolkit for systematic intraday trading on TradingView. The current focus is SPY 0DTE options scalping and multi-chart directional bias monitoring, with plans to expand into broader market internals, multi-asset strategies, and backtesting frameworks.
+This repository is an evolving toolkit for systematic trading on TradingView. The current focus spans three tiers: SPY 0DTE options scalping (intraday signal generation), multi-chart directional bias monitoring (watchlist reconnaissance), and strategic trend assessment (multi-day/multi-week trend evaluation for any equity, ETF, or index). Plans include broader market internals, multi-asset strategies, and backtesting frameworks.
 
-Currently, the suite includes a family of SPY 0DTE Scalper indicators spanning three timeframes (1-minute, 5-minute, 15-minute), each independently calibrated for its target holding period, plus a general-purpose Market Monitor and a 5-minute optimized Market Monitor for watchlist reconnaissance. All indicators share a common architectural foundation: EMA ribbon overlays, session-anchored VWAP with deviation bands, regime classification, and real-time dashboards with color-coded status fields. They diverge in signal generation approach, parameter calibration, and feature depth based on the characteristics of their target timeframe.
+Currently, the suite includes a family of SPY 0DTE Scalper indicators spanning three timeframes (1-minute, 5-minute, 15-minute), each independently calibrated for its target holding period; a general-purpose Market Monitor and a 5-minute optimized Market Monitor for watchlist reconnaissance; and a Trend Compass family (Daily, 4-Hour) for strategic trend assessment on any liquid instrument. All indicators share a common architectural foundation: EMA ribbon overlays, regime/phase classification, weighted scoring engines, and real-time dashboards with color-coded status fields. They diverge in signal generation approach, parameter calibration, and feature depth based on the characteristics of their target timeframe and use case.
 
 ## Indicators
 
@@ -62,6 +62,48 @@ The **general-purpose** variant is timeframe-adaptive (1m through Daily) with a 
 | Dashboard rows | 12 | 18 |
 | Alert conditions | 6 | 9 |
 
+### Trend Compass
+
+Strategic trend assessment overlays for evaluating multi-day and multi-week trends on any equity, ETF, or index. These are not signal generators and not SPY-specific. They answer: "What is the trend? How strong is it? Is it accelerating or exhausting? Are divergences forming?" Use them to establish macro bias before deploying intraday tools.
+
+The **Daily** variant is the primary strategic view, pulling Weekly context internally. The **4-Hour** variant provides faster feedback on trend shifts within the current multi-day swing, pulling Daily and Weekly context via `request.security()`.
+
+| Script | Timeframe | Version | Score Range | HTF Context | Dashboard Rows | Docs |
+| ------ | --------- | ------- | ----------- | ----------- | -------------- | ---- |
+| [trend_compass_daily_v1_0.pine](trend_compass/trend_compass_daily_v1_0.pine) | Daily | v1.0 | -11 to +11 (weighted) | Weekly 50 EMA | 17 | [docs](docs/trend_compass_daily_v1_0.md) |
+| [trend_compass_4h_v1_0.pine](trend_compass/trend_compass_4h_v1_0.pine) | 4-Hour | v1.0 | -11 to +11 (weighted) | D50 + D200 + W50 EMA | 18 | [docs](docs/trend_compass_4h_v1_0.md) |
+
+#### Trend Compass Comparison
+
+| Feature | Daily (v1.0) | 4-Hour (v1.0) |
+| ------- | ------------ | -------------- |
+| EMA Ribbon | 10/21/50 (local) | 10/21/50 (local, 4H bars) |
+| Anchor EMA | 200 (local daily) | Daily 200 EMA (via `request.security`) |
+| HTF layers | Weekly 50 EMA | Daily 50 + Daily 200 + Weekly 50 |
+| Key levels | Prior Week + Prior Month H/L/C | Prior Day + Prior Week H/L/C |
+| 52-Week H/L | Local `ta.highest(252)` | Via Daily `request.security` |
+| Divergence pivots | 5L/3R, 15-bar decay | 4L/2R, 20-bar decay |
+| ATR/BB percentile lookback | 100 bars (~5 months) | 200 bars (~33 days) |
+| EMA compression threshold | 0.5% | 0.3% |
+| Fibonacci (optional) | 50-bar lookback | 100-bar lookback |
+| Ichimoku Cloud (optional) | Standard 9/26/52/26 | Standard 9/26/52/26 |
+| `request.security` calls | 3 | 6 |
+| Dashboard rows | 17 | 18 |
+| Alert conditions | 12 | 12 |
+
+#### Trend Phase Lifecycle
+
+The Trend Compass introduces a six-state trend phase classifier that maps where a trend sits in its lifecycle:
+
+| Phase | ADX Context | EMA Context | Interpretation |
+| ----- | ----------- | ----------- | -------------- |
+| EMERGING | ADX < 25, rising | EMAs separating | New trend forming. Early entry opportunity. |
+| ACCELERATING | ADX > 20, rising | Slope confirming | Trend gaining momentum. Strongest phase. |
+| MATURE | ADX > 30, flat | Aligned but plateauing | Trend intact, momentum fading. Trail stops. |
+| EXHAUSTING | ADX declining from > 30 | Slope flattening | Trend losing steam. Prepare for transition. |
+| CONSOLIDATING | ADX < 20 | Compressed | Range-bound. No directional bias. |
+| REVERSING | Recent crossovers | Crossover detected | Trend change underway. Re-evaluate bias. |
+
 ## Timeframe Comparison
 
 Key parameter and architectural differences across the SPY 0DTE Scalper variants (v1.1 for each):
@@ -107,7 +149,11 @@ Every indicator in the suite shares these foundational components, calibrated pe
 
 ## Installation
 
-1. Open TradingView and navigate to a **SPY chart** at the appropriate timeframe.
+1. Open TradingView and navigate to the appropriate chart and timeframe for the indicator.
+   - **SPY 0DTE Scalpers**: SPY chart at the matching timeframe (1m, 5m, or 15m).
+   - **Market Monitors**: Any ticker at any intraday timeframe (general) or 5-minute (optimized variant).
+   - **Trend Compass Daily**: Any ticker on a Daily chart.
+   - **Trend Compass 4H**: Any ticker on a 4-Hour chart.
 2. Open the **Pine Editor** (bottom panel).
 3. Delete any existing code in the editor.
 4. Paste the entire contents of the desired `.pine` file.
@@ -138,6 +184,10 @@ detects sessions, calculates levels, or generates signals.
 
 ## Recommended Layouts
 
+### Strategic Trend Assessment
+
+Run the Trend Compass Daily on a standalone chart for any ticker you're evaluating. Check trend phase, composite score, and divergence status to establish the macro bias. For faster feedback during active swing trading, add the Trend Compass 4H alongside the Daily. Neither requires SPY — use on NVDA, AAPL, GOOGL, QQQ, IWM, or any liquid instrument.
+
 ### Single-Timeframe Focus
 
 Run one SPY 0DTE Scalper on a full-screen chart. Best for dedicated scalping sessions where you want maximum visual clarity.
@@ -152,18 +202,22 @@ Run 6-8 Market Monitor instances on small chart tiles across your watchlist. Use
 
 For 5-minute focused monitoring, use the Market Monitor 5m variant — it provides richer context (session phase, squeeze state, TICK breadth, ATR regime, opening range position) at the cost of being optimized for a single timeframe. For timeframe-flexible watchlists spanning 1m through Daily, use the general-purpose Market Monitor.
 
+### Full Pipeline
+
+Trend Compass Daily/4H (macro bias) → Market Monitor watchlist scan (intraday alignment) → 0DTE Scalper on strongest setups (signal execution). Each layer narrows the decision space for the next.
+
 ## Performance and Limits
 
 All indicators are optimized for simultaneous multi-instance execution on TradingView.
 
-| Resource | Pine Script v6 Limit | Scalpers (per instance) | Monitor GP (per instance) | Monitor 5m (per instance) |
-| -------- | -------------------- | ----------------------- | ------------------------- | ------------------------- |
-| `request.security()` calls | 40 per script | 4-5 | 3 | 4 |
-| Labels | 500 per script | ~50-100 per session | 100 max | 200 max |
-| Lines | 500 per script | ~20-40 | 200 max | 300 max |
-| Boxes | 200 per script | ~5-10 | 50 max | 100 max |
+| Resource | Pine Script v6 Limit | Scalpers (per instance) | Monitor GP (per instance) | Monitor 5m (per instance) | TC Daily (per instance) | TC 4H (per instance) |
+| -------- | -------------------- | ----------------------- | ------------------------- | ------------------------- | ----------------------- | -------------------- |
+| `request.security()` calls | 40 per script | 4-5 | 3 | 4 | 3 | 6 |
+| Labels | 500 per script | ~50-100 per session | 100 max | 200 max | 500 max | 500 max |
+| Lines | 500 per script | ~20-40 | 200 max | 300 max | 500 max | 500 max |
+| Boxes | 200 per script | ~5-10 | 50 max | 100 max | 100 max | 100 max |
 
-**Computation**: No loops except the Market Monitor 5m's ATR percentile ranking (configurable lookback, default 100 bars — lightweight). All other calculations are vectorized with `var` declarations for persistent state. Dashboard tables update only on `barstate.islast` to minimize historical bar overhead.
+**Computation**: No loops except percentile ranking calculations (ATR and BB width, in Market Monitor 5m and both Trend Compass variants — configurable lookback, default 100-200 bars, lightweight). All other calculations are vectorized with `var` declarations for persistent state. Dashboard tables update only on `barstate.islast` to minimize historical bar overhead.
 
 **Repainting**: All signal logic is gated by `barstate.isconfirmed` by default. Signals appear after bar close, not during formation. `request.security()` calls use `lookahead=barmerge.lookahead_off` for all forward-looking data to prevent future data leakage. Prior day levels use `lookahead_on` which is appropriate for historical reference levels.
 
@@ -173,13 +227,17 @@ All indicators are optimized for simultaneous multi-instance execution on Tradin
 
 **No volume profile.** Pine Script cannot natively compute POC, VAH, VAL. Use TradingView's built-in Volume Profile tool or a separate indicator alongside.
 
-**Single-symbol calibration.** All parameters are calibrated for SPY's price range, volatility, and microstructure. Other instruments require significant parameter adjustment.
+**Single-symbol calibration.** The 0DTE Scalper parameters are calibrated for SPY's price range, volatility, and microstructure. Other instruments require significant parameter adjustment. The Trend Compass and Market Monitor indicators are ticker-agnostic and work on any liquid instrument without recalibration.
 
 **No backtest capability.** These are `indicator()` scripts, not `strategy()` scripts. They cannot be run through TradingView's strategy tester. Conversion would require defining explicit entry/exit rules, position sizing, and stop/target logic.
 
-**Equal-weighted conditions (1-min).** The 1-minute AND-gate treats all conditions as binary pass/fail with no relative weighting. The 5-minute and 15-minute scoring models partially address this by allowing differential contribution.
+**Equal-weighted conditions (1-min).** The 1-minute AND-gate treats all conditions as binary pass/fail with no relative weighting. The 5-minute, 15-minute, Market Monitor 5m, and Trend Compass scoring models partially address this by allowing differential contribution via weighted scoring.
 
 **Market Monitor 5m is timeframe-specific.** While it will technically run on other intraday timeframes, session phase detection, OR duration defaults, HTF mapping (fixed to 15m), and scoring parameters are calibrated for 5-minute bars. For other timeframes, use the general-purpose Market Monitor.
+
+**Trend Compass divergence detection has inherent lag.** Pivot-based divergence detection requires N right bars of confirmation before a divergence is confirmed. On the Daily variant (3R default), this means ~3 days of delay. On the 4H variant (2R default), ~8 hours. This is fundamental to pivot-based detection and cannot be eliminated without introducing false signals.
+
+**Trend Compass 52-week H/L requires history.** The Daily variant needs 252 bars of daily history. The 4H variant pulls this from the Daily timeframe via `request.security()`. Very recently listed instruments may not have sufficient data.
 
 ## Project Structure
 
@@ -196,6 +254,9 @@ All indicators are optimized for simultaneous multi-instance execution on Tradin
 │   ├── spy_0dte_scalper_5min_v1_1.pine
 │   ├── spy_0dte_scalper_15min_v1_0.pine
 │   └── spy_0dte_scalper_15min_v1_1.pine
+├── trend_compass/
+│   ├── trend_compass_daily_v1_0.pine
+│   └── trend_compass_4h_v1_0.pine
 └── docs/
     ├── market_monitor_v1_0.md
     ├── market_monitor_5min_v1_0.md
@@ -204,7 +265,9 @@ All indicators are optimized for simultaneous multi-instance execution on Tradin
     ├── spy_0dte_scalper_5min_v1.0.md
     ├── spy_0dte_scalper_5min_v1.1.md
     ├── spy_0dte_scalper_15min_v1_0.md
-    └── spy_0dte_scalper_15min_v1_1.md
+    ├── spy_0dte_scalper_15min_v1_1.md
+    ├── trend_compass_daily_v1_0.md
+    └── trend_compass_4h_v1_0.md
 ```
 
 ## Changelog
