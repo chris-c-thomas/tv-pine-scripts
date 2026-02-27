@@ -403,7 +403,9 @@ bool  mtfBullish    = mtfEmaFastVal > mtfEmaSlowVal
 bool  mtfBearish    = mtfEmaFastVal < mtfEmaSlowVal
 
 // Pull 5-minute MACD histogram for momentum context
-float mtfMacdHist = request.security(syminfo.tickerid, "5", ta.macd(close, 12, 26, 9)[2], lookahead=barmerge.lookahead_off)
+// Destructure MACD tuple at global scope — ta.macd() returns [line, signal, histogram]
+[_macd5Line, _macd5Sig, _macd5Hist] = ta.macd(close, 12, 26, 9)
+float mtfMacdHist = request.security(syminfo.tickerid, "5", _macd5Hist, lookahead=barmerge.lookahead_off)
 
 // Pull 5-minute VWAP cross detection
 bool mtfVwapCrossUp  = request.security(syminfo.tickerid, "5", ta.crossover(close, ta.vwap(hlc3)),  lookahead=barmerge.lookahead_off)
@@ -974,6 +976,9 @@ var table dash = table.new(position.top_right, 3, 26,
 float dayOpen = request.security(syminfo.tickerid, "D", open, lookahead=barmerge.lookahead_on)
 float avgVol  = ta.sma(volume, 20)
 
+// Session progress — ta.barssince must run on every bar for consistency
+int barsInSession = ta.barssince(rthStart)
+
 if barstate.islast and i_showDash
     string sz = i_dashSize
 
@@ -1202,7 +1207,6 @@ if barstate.islast and i_showDash
     table.cell(dash, 2, 24, "ATR " + f2(atrRatio) + "x avg", text_color=getAtrRegimeColor(), text_size=cellSize, text_halign=text.align_right)
 
     // --- Row 25: Session Progress ---
-    int barsInSession = ta.barssince(rthStart)
     int totalBars     = math.round(390 / 15)  // 26 bars per RTH session
     string barPctStr  = isRTH ? str.tostring(barsInSession) + "/" + str.tostring(totalBars) : "PRE-MKT"
     color barPctClr   = isRTH and barsInSession > 20 ? C_ORANGE : isRTH ? C_NEUTRAL : C_GRAY
