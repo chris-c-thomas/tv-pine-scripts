@@ -23,12 +23,30 @@ Each timeframe variant is independently calibrated. The signal engine approach d
 
 | Script | Timeframe | Version | Signal Engine | Hold Time | Docs |
 | ------ | --------- | ------- | ------------- | --------- | ---- |
-| [spy_0dte_scalper_1min_v1.0.pine](spy_0dte_scalper/spy_0dte_scalper_1min_v1.0.pine) | 1-min | v1.0 | AND-gate | 1-5 min | [docs](docs/spy_0dte_scalper_1min_v1.0.md) |
-| [spy_0dte_scalper_1min_v1.1.pine](spy_0dte_scalper/spy_0dte_scalper_1min_v1.1.pine) | 1-min | v1.1 | AND-gate + optional filters | 1-5 min | [docs](docs/spy_0dte_scalper_1min_v1.1.md) |
-| [spy_0dte_scalper_5min_v1.0.pine](spy_0dte_scalper/spy_0dte_scalper_5min_v1.0.pine) | 5-min | v1.0 | 5+2 scoring | 5-25 min | [docs](docs/spy_0dte_scalper_5min_v1.0.md) |
-| [spy_0dte_scalper_5min_v1.1.pine](spy_0dte_scalper/spy_0dte_scalper_5min_v1.1.pine) | 5-min | v1.1 | 5+4 scoring | 5-25 min | [docs](docs/spy_0dte_scalper_5min_v1.1.md) |
-| [spy_0dte_scalper_15min_v1_0.pine](spy_0dte_scalper/spy_0dte_scalper_15min_v1_0.pine) | 15-min | v1.0 | Scoring + bias | 15-60 min | [docs](docs/spy_0dte_scalper_15min_v1_0.md) |
-| [spy_0dte_scalper_15min_v1_1.pine](spy_0dte_scalper/spy_0dte_scalper_15min_v1_1.pine) | 15-min | v1.1 | Scoring + bias | 15-60 min | [docs](docs/spy_0dte_scalper_15min_v1_1.md) |
+| [spy_0dte_scalper_1min.pine](spy_0dte_scalper/spy_0dte_scalper_1min.pine) | 1-min | v1.1 | AND-gate + optional filters | 1-5 min | [docs](docs/spy_0dte_scalper_1min.md) |
+| [spy_0dte_scalper_5min.pine](spy_0dte_scalper/spy_0dte_scalper_5min.pine) | 5-min | v1.1 | 5+4 scoring | 5-25 min | [docs](docs/spy_0dte_scalper_5min.md) |
+| [spy_0dte_scalper_15min.pine](spy_0dte_scalper/spy_0dte_scalper_15min.pine) | 15-min | v1.1 | Scoring + bias | 15-60 min | [docs](docs/spy_0dte_scalper_15min.md) |
+
+#### Timeframe Comparison
+
+Key parameter and architectural differences across the SPY 0DTE Scalper variants:
+
+| Parameter | 1-Minute | 5-Minute | 15-Minute |
+| --------- | -------- | -------- | --------- |
+| EMA Lengths | 8 / 13 / 21 | 9 / 15 / 21 | 13 / 21 / 55 |
+| RSI Length | 14 | 10 | 10 |
+| RSI OB / OS | 70 / 30 | 65 / 35 | 65 / 35 |
+| ADX No-Trend Threshold | 15 | 18 | 20 |
+| Opening Range | 5 min (5 bars) | 15 min (3 bars) | 30 min (2 bars) |
+| Signal Cooldown | 5 bars (5 min) | 3 bars (15 min) | 2 bars (30 min) |
+| Signal Window Start | 09:35 | 09:45 | 10:00 |
+| VWAP Extended Distance | 1.5 ATR | 2.0 ATR | 2.5 ATR |
+| Signal Engine | AND-gate | 5+4 scoring | Scoring + bias |
+| Squeeze Integration | AND-gate filter (opt-in) | Scoring condition | Scoring condition |
+| TICK Integration | AND-gate filter (opt-in) | Scoring condition | Scoring condition |
+| MTF Confirmation | N/A | 1-min RSI + EMA | 5-min RSI + EMA |
+| RTH Bars / Session | ~390 | ~78 | ~26 |
+| Dashboard Rows | 16 | 18 | 18+ |
 
 ### Market Monitor
 
@@ -38,8 +56,8 @@ The **general-purpose** variant is timeframe-adaptive (1m through Daily) with a 
 
 | Script | Variant | Version | Bias Score Range | Dashboard Rows | Docs |
 | ------ | ------- | ------- | ---------------- | -------------- | ---- |
-| [market_monitor_v1_0.pine](market_monitor/market_monitor_1min_v1_0.pine) | General Purpose | v1.0 | -5 to +5 (equal) | 12 | [docs](docs/market_monitor_1min_v1_0.md) |
-| [market_monitor_5min_v1_0.pine](market_monitor/market_monitor_5min_v1_0.pine) | 5-Minute Optimized | v1.0 | -11 to +11 (weighted) | 18 | [docs](docs/market_monitor_5min_v1_0.md) |
+| [market_monitor_1min.pine](market_monitor/market_monitor_1min.pine) | General Purpose | v1.0 | -5 to +5 (equal) | 12 | [docs](docs/market_monitor_1min.md) |
+| [market_monitor_5min.pine](market_monitor/market_monitor_5min.pine) | 5-Minute Optimized | v1.0 | -11 to +11 (weighted) | 18 | [docs](docs/market_monitor_5min.md) |
 
 #### Market Monitor Comparison
 
@@ -70,8 +88,8 @@ The **Daily** variant is the primary strategic view, pulling Weekly context inte
 
 | Script | Timeframe | Version | Score Range | HTF Context | Dashboard Rows | Docs |
 | ------ | --------- | ------- | ----------- | ----------- | -------------- | ---- |
-| [trend_compass_daily_v1_0.pine](trend_compass/trend_compass_daily_v1_0.pine) | Daily | v1.0 | -11 to +11 (weighted) | Weekly 50 EMA | 17 | [docs](docs/trend_compass_daily_v1_0.md) |
-| [trend_compass_4h_v1_0.pine](trend_compass/trend_compass_4h_v1_0.pine) | 4-Hour | v1.0 | -11 to +11 (weighted) | D50 + D200 + W50 EMA | 18 | [docs](docs/trend_compass_4h_v1_0.md) |
+| [trend_compass_daily.pine](trend_compass/trend_compass_daily.pine) | Daily | v1.0 | -11 to +11 (weighted) | Weekly 50 EMA | 17 | [docs](docs/trend_compass_daily.md) |
+| [trend_compass_4h.pine](trend_compass/trend_compass_4h.pine) | 4-Hour | v1.0 | -11 to +11 (weighted) | D50 + D200 + W50 EMA | 18 | [docs](docs/trend_compass_4h.md) |
 
 #### Trend Compass Comparison
 
@@ -104,27 +122,6 @@ The Trend Compass introduces a six-state trend phase classifier that maps where 
 | CONSOLIDATING | ADX < 20 | Compressed | Range-bound. No directional bias. |
 | REVERSING | Recent crossovers | Crossover detected | Trend change underway. Re-evaluate bias. |
 
-## Timeframe Comparison
-
-Key parameter and architectural differences across the SPY 0DTE Scalper variants (v1.1 for each):
-
-| Parameter | 1-Minute | 5-Minute | 15-Minute |
-| --------- | -------- | -------- | --------- |
-| EMA Lengths | 8 / 13 / 21 | 9 / 15 / 21 | 13 / 21 / 55 |
-| RSI Length | 14 | 10 | 10 |
-| RSI OB / OS | 70 / 30 | 65 / 35 | 65 / 35 |
-| ADX No-Trend Threshold | 15 | 18 | 20 |
-| Opening Range | 5 min (5 bars) | 15 min (3 bars) | 30 min (2 bars) |
-| Signal Cooldown | 5 bars (5 min) | 3 bars (15 min) | 2 bars (30 min) |
-| Signal Window Start | 09:35 | 09:45 | 10:00 |
-| VWAP Extended Distance | 1.5 ATR | 2.0 ATR | 2.5 ATR |
-| Signal Engine | AND-gate | 5+4 scoring | Scoring + bias |
-| Squeeze Integration | AND-gate filter (opt-in) | Scoring condition | Scoring condition |
-| TICK Integration | AND-gate filter (opt-in) | Scoring condition | Scoring condition |
-| MTF Confirmation | N/A | 1-min RSI + EMA | 5-min RSI + EMA |
-| RTH Bars / Session | ~390 | ~78 | ~26 |
-| Dashboard Rows | 16 | 18 | 18+ |
-
 ## Core Components
 
 Every indicator in the suite shares these foundational components, calibrated per-timeframe:
@@ -137,15 +134,13 @@ Every indicator in the suite shares these foundational components, calibrated pe
 
 **Regime Classification** -- Five-mode classifier (BULLISH, BEARISH, RANGING, NO TRADE, TRANSITION) based on EMA alignment, ADX strength, and RSI positioning. Provides context for signal interpretation.
 
+**TTM Squeeze** -- Bollinger Band (20, 2.0) compression inside Keltner Channels (20, 1.5). Three states: SQUEEZE ON (compression building), FIRED (breakout beginning), OFF (normal volatility). Momentum histogram via linear regression. Present in all scalper timeframes; also included in Market Monitor 5m.
+
+**NYSE TICK Index** -- Real-time market breadth via `request.security("USI:TICK", "1", close)`. Six-tier classification from EXTREME BEAR to EXTREME BULL with configurable thresholds. Present in all scalper timeframes and Market Monitor 5m.
+
 **Dashboard** -- Real-time table overlay with color-coded status fields covering all active indicators. Configurable size (Tiny/Small/Normal) and corner positioning for multi-chart layouts.
 
 **Alert System** -- Dual implementation: static `alertcondition()` for TradingView's standard alert UI, plus dynamic `alert()` with interpolated context for webhook and notification pipelines.
-
-### v1.1 Additions (All Scalper Timeframes)
-
-**TTM Squeeze** -- Bollinger Band (20, 2.0) compression inside Keltner Channels (20, 1.5). Three states: SQUEEZE ON (compression building), FIRED (breakout beginning), OFF (normal volatility). Momentum histogram via linear regression.
-
-**NYSE TICK Index** -- Real-time market breadth via `request.security("USI:TICK", "1", close)`. Six-tier classification from EXTREME BEAR to EXTREME BULL with configurable thresholds.
 
 ## Installation
 
@@ -180,7 +175,7 @@ detects sessions, calculates levels, or generates signals.
 
 ### Data Requirements
 
-**NYSE TICK** (v1.1 scalpers and Market Monitor 5m): The TICK index (`USI:TICK`) requires your TradingView data plan to include the relevant exchange. If unavailable, TICK rows show "N/A" and TICK-based signal conditions pass through without blocking (1-min) or simply don't contribute score (5-min, 15-min, Market Monitor 5m).
+**NYSE TICK** (scalpers and Market Monitor 5m): The TICK index (`USI:TICK`) requires your TradingView data plan to include the relevant exchange. If unavailable, TICK rows show "N/A" and TICK-based signal conditions pass through without blocking (1-min) or simply don't contribute score (5-min, 15-min, Market Monitor 5m).
 
 ## Recommended Layouts
 
@@ -244,30 +239,25 @@ All indicators are optimized for simultaneous multi-instance execution on Tradin
 ```
 ├── README.md
 ├── CHANGELOG.md
+├── CLAUDE.md
 ├── market_monitor/
-│   ├── market_monitor_v1_0.pine
-│   └── market_monitor_5min_v1_0.pine
+│   ├── market_monitor_1min.pine
+│   └── market_monitor_5min.pine
 ├── spy_0dte_scalper/
-│   ├── spy_0dte_scalper_1min_v1_0.pine
-│   ├── spy_0dte_scalper_1min_v1_1.pine
-│   ├── spy_0dte_scalper_5min_v1_0.pine
-│   ├── spy_0dte_scalper_5min_v1_1.pine
-│   ├── spy_0dte_scalper_15min_v1_0.pine
-│   └── spy_0dte_scalper_15min_v1_1.pine
+│   ├── spy_0dte_scalper_1min.pine
+│   ├── spy_0dte_scalper_5min.pine
+│   └── spy_0dte_scalper_15min.pine
 ├── trend_compass/
-│   ├── trend_compass_daily_v1_0.pine
-│   └── trend_compass_4h_v1_0.pine
+│   ├── trend_compass_daily.pine
+│   └── trend_compass_4h.pine
 └── docs/
-    ├── market_monitor_v1_0.md
-    ├── market_monitor_5min_v1_0.md
-    ├── spy_0dte_scalper_1min_v1.0.md
-    ├── spy_0dte_scalper_1min_v1.1.md
-    ├── spy_0dte_scalper_5min_v1.0.md
-    ├── spy_0dte_scalper_5min_v1.1.md
-    ├── spy_0dte_scalper_15min_v1_0.md
-    ├── spy_0dte_scalper_15min_v1_1.md
-    ├── trend_compass_daily_v1_0.md
-    └── trend_compass_4h_v1_0.md
+    ├── market_monitor_1min.md
+    ├── market_monitor_5min.md
+    ├── spy_0dte_scalper_1min.md
+    ├── spy_0dte_scalper_5min.md
+    ├── spy_0dte_scalper_15min.md
+    ├── trend_compass_daily.md
+    └── trend_compass_4h.md
 ```
 
 ## Changelog

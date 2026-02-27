@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## (2026-02-27) -- Repository maintenance
+
+- Removed v1.0 versions of all SPY 0DTE Scalper scripts (1-minute, 5-minute, 15-minute). v1.1 is now the canonical and only version for each timeframe.
+- Renamed all script and documentation files to remove version suffixes from filenames. Version information is now tracked within file headers and document titles only.
+- Updated README.md: consolidated scalper indicator table to current versions, corrected all file and doc links, moved the Timeframe Comparison table inside the SPY 0DTE Scalper section, and folded TTM Squeeze and NYSE TICK into Core Components as standard features.
+
+---
+
 ## v1.0 (2026-02-27) -- Trend Compass Daily + 4H
 
 - New strategic trend assessment indicator family for multi-day/multi-week trend evaluation on any equity, ETF, or index.
